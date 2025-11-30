@@ -1,7 +1,7 @@
 Key Features for your laundry platform:
 Customer side:
-Homepage - Show services, pricing, how it works
-Booking form - Schedule pickup (date, time, address)
+Homepage - Show services, pricing, how it works --- this is checked 
+Booking form - Schedule pickup (date, time, address) -- next on the list to be executed
 Service selection - Choose services (wash, iron, dry clean, etc.)
 Pricing calculator - Estimate cost based on items
 Order tracking - See status (picked up → cleaning → delivery)
