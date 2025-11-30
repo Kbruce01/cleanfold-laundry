@@ -4,12 +4,26 @@ import { useForm } from 'react-hook-form';
 export default function BookingPage() {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedServices, setSelectedServices] = useState([]);
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
-    console.log('Booking data:', data);
     
-    // Simulate API call
+    // Check if at least one service is selected
+    if (selectedServices.length === 0) {
+      alert('Please select at least one service');
+      setIsSubmitting(false);
+      return;
+    }
+    
+    // Combine form data with selected services
+    const bookingData = {
+      ...data,
+      services: selectedServices
+    };
+    
+    console.log('Booking data:', bookingData);
+    
     setTimeout(() => {
       alert('Booking submitted successfully! (This will connect to backend later)');
       setIsSubmitting(false);
@@ -17,10 +31,34 @@ export default function BookingPage() {
   };
 
   const serviceOptions = [
-    { value: 'wash-fold', label: 'Wash & Fold - $1.50/lb' },
-    { value: 'dry-clean', label: 'Dry Cleaning - $8.99/item' },
-    { value: 'premium-care', label: 'Premium Care - $15.99/item' },
-    { value: 'ironing', label: 'Ironing - $1.50/item' },
+    { 
+      id: 'wash-fold', 
+      name: 'Wash & Fold', 
+      price: 1.50, 
+      unit: 'per lb',
+      description: 'Your clothes washed, dried, and neatly folded'
+    },
+    { 
+      id: 'dry-clean', 
+      name: 'Dry Cleaning', 
+      price: 8.99, 
+      unit: 'per item',
+      description: 'Professional dry cleaning for delicate items'
+    },
+    { 
+      id: 'premium-care', 
+      name: 'Premium Care', 
+      price: 15.99, 
+      unit: 'per item',
+      description: 'Delicate handling with hand finishing'
+    },
+    { 
+      id: 'ironing', 
+      name: 'Ironing', 
+      price: 1.50, 
+      unit: 'per item',
+      description: 'Crisp and wrinkle-free clothes'
+    },
   ];
 
   const timeSlots = [
@@ -30,6 +68,20 @@ export default function BookingPage() {
     '3:00 PM - 5:00 PM',
     '5:00 PM - 7:00 PM',
   ];
+
+  const handleServiceToggle = (service) => {
+    setSelectedServices((prev) => {
+      const exists = prev.find(s => s.id === service.id);
+      
+      if (exists) {
+        // Remove service
+        return prev.filter(s => s.id !== service.id);
+      } else {
+        // Add service
+        return [...prev, service];
+      }
+    });
+  };
 
   return (
     <div style={{
@@ -174,7 +226,7 @@ export default function BookingPage() {
               <textarea
                 {...register('address', { required: 'Address is required' })}
                 rows="3"
-                placeholder="123 Main Street, Apt 4B, Accra"
+                placeholder="123 Main Street, Apt 4B, Toronto, ON"
                 style={{
                   width: '100%',
                   padding: 'clamp(12px, 2vw, 14px)',
@@ -213,47 +265,127 @@ export default function BookingPage() {
               Service Details
             </h2>
 
-            {/* Service Type */}
+            {/* Services (Checkboxes) */}
             <div style={{ marginBottom: '24px' }}>
               <label style={{
                 display: 'block',
                 fontSize: 'clamp(14px, 2vw, 16px)',
                 fontWeight: '500',
                 color: '#374151',
-                marginBottom: '8px'
+                marginBottom: '12px'
               }}>
-                Service Type <span style={{ color: '#ef4444' }}>*</span>
+                Select Services <span style={{ color: '#ef4444' }}>*</span>
               </label>
-              <select
-                {...register('serviceType', { required: 'Please select a service' })}
-                style={{
-                  width: '100%',
-                  padding: 'clamp(12px, 2vw, 14px)',
-                  border: errors.serviceType ? '2px solid #ef4444' : '1px solid #d1d5db',
-                  borderRadius: '8px',
-                  fontSize: 'clamp(14px, 2vw, 16px)',
-                  outline: 'none',
-                  backgroundColor: 'white',
-                  cursor: 'pointer'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#6366f1'}
-                onBlur={(e) => e.target.style.borderColor = errors.serviceType ? '#ef4444' : '#d1d5db'}
-              >
-                <option value="">Select a service...</option>
-                {serviceOptions.map((service) => (
-                  <option key={service.value} value={service.value}>
-                    {service.label}
-                  </option>
-                ))}
-              </select>
-              {errors.serviceType && (
+              
+              <div style={{
+                display: 'grid',
+                gap: '12px'
+              }}>
+                {serviceOptions.map((service) => {
+                  const isSelected = selectedServices.find(s => s.id === service.id);
+                  
+                  return (
+                    <div
+                      key={service.id}
+                      onClick={() => handleServiceToggle(service)}
+                      style={{
+                        border: isSelected ? '2px solid #6366f1' : '1px solid #d1d5db',
+                        borderRadius: '12px',
+                        padding: 'clamp(14px, 3vw, 18px)',
+                        cursor: 'pointer',
+                        backgroundColor: isSelected ? '#eff6ff' : 'white',
+                        transition: 'all 0.2s',
+                        position: 'relative'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                        {/* Checkbox */}
+                        <div style={{
+                          width: '20px',
+                          height: '20px',
+                          border: isSelected ? '2px solid #6366f1' : '2px solid #d1d5db',
+                          borderRadius: '4px',
+                          backgroundColor: isSelected ? '#6366f1' : 'white',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                          marginTop: '2px'
+                        }}>
+                          {isSelected && (
+                            <span style={{ color: 'white', fontSize: '14px', fontWeight: 'bold' }}>✓</span>
+                          )}
+                        </div>
+                        
+                        {/* Service Info */}
+                        <div style={{ flex: 1 }}>
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'flex-start',
+                            marginBottom: '6px'
+                          }}>
+                            <h3 style={{
+                              fontSize: 'clamp(15px, 2.5vw, 17px)',
+                              fontWeight: '600',
+                              color: '#111827'
+                            }}>
+                              {service.name}
+                            </h3>
+                            <span style={{
+                              fontSize: 'clamp(15px, 2.5vw, 17px)',
+                              fontWeight: 'bold',
+                              color: '#6366f1',
+                              whiteSpace: 'nowrap',
+                              marginLeft: '12px'
+                            }}>
+                              ${service.price} {service.unit}
+                            </span>
+                          </div>
+                          <p style={{
+                            fontSize: 'clamp(13px, 2vw, 14px)',
+                            color: '#6b7280',
+                            margin: 0
+                          }}>
+                            {service.description}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {selectedServices.length === 0 && (
                 <p style={{
-                  color: '#ef4444',
+                  color: '#6b7280',
                   fontSize: 'clamp(12px, 1.5vw, 14px)',
-                  marginTop: '6px'
+                  marginTop: '8px',
+                  fontStyle: 'italic'
                 }}>
-                  {errors.serviceType.message}
+                  Please select at least one service
                 </p>
+              )}
+              
+              {/* Selected services summary */}
+              {selectedServices.length > 0 && (
+                <div style={{
+                  marginTop: '16px',
+                  padding: '12px',
+                  backgroundColor: '#f0fdf4',
+                  borderRadius: '8px',
+                  border: '1px solid #86efac'
+                }}>
+                  <p style={{
+                    fontSize: 'clamp(13px, 2vw, 14px)',
+                    color: '#166534',
+                    fontWeight: '500',
+                    margin: 0
+                  }}>
+                    ✓ {selectedServices.length} service{selectedServices.length > 1 ? 's' : ''} selected: {' '}
+                    {selectedServices.map(s => s.name).join(', ')}
+                  </p>
+                </div>
               )}
             </div>
 
