@@ -1,4 +1,20 @@
-export default function HomePage() {
+import { NavLink, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+
+export default function HomePage({ initialHash }) {
+  const location = useLocation();
+
+  useEffect(() => {
+    // prefer explicit hash in the URL; otherwise fall back to initialHash prop
+    const hashFromLocation = location && location.hash ? location.hash.replace('#', '') : null;
+    const targetId = hashFromLocation || initialHash || null;
+    if (targetId) {
+      const el = document.getElementById(targetId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [location, initialHash]);
   return (
     <div>
       {/* Hero Section */}
@@ -51,20 +67,21 @@ export default function HomePage() {
             gap: '15px',
             flexWrap: 'wrap'
           }}>
-            <button style={{
+            <NavLink to="/booking" style={{
               backgroundColor: '#6366f1',
               color: 'white',
-              padding: 'clamp(12px, 2vw, 16px) clamp(24px, 4vw, 40px)',
-              fontSize: 'clamp(14px, 2vw, 18px)',
+              padding: '10px 24px',
+              fontSize: '16px',
               fontWeight: '600',
-              border: 'none',
-              borderRadius: '30px',
+              borderRadius: '25px',
+              textDecoration: 'none',
+              display: 'inline-block',
               cursor: 'pointer'
             }}>
               Schedule Pickup
-            </button>
-            
-            <button style={{
+            </NavLink>
+
+            <NavLink to="/#pricing" style={{
               backgroundColor: 'white',
               color: '#374151',
               padding: 'clamp(12px, 2vw, 16px) clamp(24px, 4vw, 40px)',
@@ -72,10 +89,11 @@ export default function HomePage() {
               fontWeight: '600',
               border: 'none',
               borderRadius: '30px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              textDecoration: 'none',
             }}>
               View Pricing
-            </button>
+            </NavLink>
           </div>
         </div>
       </section>
@@ -180,7 +198,7 @@ export default function HomePage() {
       </section>
 
       {/* Pricing Section */}
-      <section style={{
+      <section id="pricing" style={{
         backgroundColor: 'white',
         padding: 'clamp(60px, 10vw, 100px) clamp(20px, 5vw, 40px)',
         textAlign: 'center'
@@ -277,7 +295,7 @@ export default function HomePage() {
             Join thousands of happy customers. First order gets 20% off!
           </p>
 
-          <button style={{
+          <NavLink to="/booking" style={{
             backgroundColor: 'white',
             color: '#667eea',
             padding: 'clamp(12px, 2vw, 16px) clamp(30px, 5vw, 50px)',
@@ -285,11 +303,13 @@ export default function HomePage() {
             fontWeight: '600',
             border: 'none',
             borderRadius: '30px',
+            textDecoration: 'none',
+            display: 'inline-block',
             cursor: 'pointer',
             boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
           }}>
             Schedule Your First Pickup
-          </button>
+          </NavLink>
         </div>
       </section>
 

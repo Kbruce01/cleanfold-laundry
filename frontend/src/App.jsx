@@ -1,6 +1,7 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
 import { useState } from 'react';
 import HomePage from './pages/HomePage';
+import Services from './pages/services';
 import BookingPage from './pages/BookingPage';
 
 function App() {
@@ -25,14 +26,14 @@ function App() {
           alignItems: 'center'
         }}>
           {/* Logo */}
-          <Link to="/" style={{
+          <NavLink to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={{
             fontSize: 'clamp(20px, 4vw, 28px)',
             fontWeight: 'bold',
             color: '#6366f1',
             textDecoration: 'none'
           }}>
             CleanFold
-          </Link>
+          </NavLink>
 
           {/* Desktop Nav Links */}
           <div style={{
@@ -42,31 +43,31 @@ function App() {
           }}
           className="desktop-nav"
           >
-            <Link to="/" style={{
+            <NavLink to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={{
               textDecoration: 'none',
               color: '#374151',
               fontSize: '16px',
               fontWeight: '500'
             }}>
               Home
-            </Link>
-            <Link to="/services" style={{
+            </NavLink>
+            <NavLink to="/services" style={{
               textDecoration: 'none',
               color: '#374151',
               fontSize: '16px',
               fontWeight: '500'
             }}>
               Services
-            </Link>
-            <Link to="/pricing" style={{
+            </NavLink>
+            <NavLink to="/pricing" style={{
               textDecoration: 'none',
               color: '#374151',
               fontSize: '16px',
               fontWeight: '500'
             }}>
               Pricing
-            </Link>
-            <Link to="/booking" style={{
+            </NavLink>
+            <NavLink to="/booking" style={{
               backgroundColor: '#6366f1',
               color: 'white',
               padding: '10px 24px',
@@ -76,7 +77,7 @@ function App() {
               fontWeight: '600'
             }}>
               Schedule Pickup
-            </Link>
+            </NavLink>
           </div>
 
           {/* Mobile Menu Button */}
@@ -108,31 +109,31 @@ function App() {
           }}
           className="mobile-menu"
           >
-            <Link to="/" onClick={() => setMenuOpen(false)} style={{
+            <NavLink to="/" onClick={() => { setMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }} style={{
               textDecoration: 'none',
               color: '#374151',
               fontSize: '16px',
               fontWeight: '500'
             }}>
               Home
-            </Link>
-            <Link to="/services" onClick={() => setMenuOpen(false)} style={{
+            </NavLink>
+            <NavLink to="/services" onClick={() => setMenuOpen(false)} style={{
               textDecoration: 'none',
               color: '#374151',
               fontSize: '16px',
               fontWeight: '500'
             }}>
               Services
-            </Link>
-            <Link to="/pricing" onClick={() => setMenuOpen(false)} style={{
+            </NavLink>
+            <NavLink to="/pricing" onClick={() => setMenuOpen(false)} style={{
               textDecoration: 'none',
               color: '#374151',
               fontSize: '16px',
               fontWeight: '500'
             }}>
               Pricing
-            </Link>
-            <Link to="/booking" onClick={() => setMenuOpen(false)} style={{
+            </NavLink>
+            <NavLink to="/booking" onClick={() => setMenuOpen(false)} style={{
               backgroundColor: '#6366f1',
               color: 'white',
               padding: '12px 24px',
@@ -143,7 +144,7 @@ function App() {
               textAlign: 'center'
             }}>
               Schedule Pickup
-            </Link>
+            </NavLink>
           </div>
         )}
       </nav>
@@ -151,7 +152,9 @@ function App() {
       {/* Routes */}
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/booking" element={<BookingPage />} />
+  <Route path="/pricing" element={<HomePage initialHash="pricing" />} />
+  <Route path="/services" element={<Services />} />
+  <Route path="/booking" element={<BookingPage />} />
       </Routes>
     </BrowserRouter>
   );
