@@ -1,33 +1,162 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useState, useEffect } from 'react';
 
 export default function BookingPage() {
-  const { register, handleSubmit, formState: { errors } } = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedServices, setSelectedServices] = useState([]);
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    address: '',
+    pickupDate: '',
+    pickupTime: '',
+    notes: ''
+  });
+  const [errors, setErrors] = useState({});
 
-  const onSubmit = async (data) => {
-    setIsSubmitting(true);
-    
-    // Check if at least one service is selected
+  // Initialize EmailJS
+  useEffect(() => {
+    // Load EmailJS script
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
+    script.async = true;
+    script.onload = () => {
+      // EmailJS Public Key
+      window.emailjs.init('iDC5YNSsaxOEWy6vw');
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    }
+
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'Phone number is required';
+    } else if (!/^[0-9+\s()-]+$/.test(formData.phone)) {
+      newErrors.phone = 'Invalid phone number';
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Invalid email address';
+    }
+
+    if (!formData.address.trim()) {
+      newErrors.address = 'Address is required';
+    }
+
+    if (!formData.pickupDate) {
+      newErrors.pickupDate = 'Date is required';
+    } else {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const selected = new Date(formData.pickupDate);
+      if (selected < today) {
+        newErrors.pickupDate = 'Please select a future date';
+      }
+    }
+
+    if (!formData.pickupTime) {
+      newErrors.pickupTime = 'Please select a time';
+    }
+
     if (selectedServices.length === 0) {
-      alert('Please select at least one service');
-      setIsSubmitting(false);
+      newErrors.services = 'Please select at least one service';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
       return;
     }
+
+    setIsSubmitting(true);
     
-    // Combine form data with selected services
-    const bookingData = {
-      ...data,
-      services: selectedServices
+    // email formating
+    const servicesText = selectedServices.map(service => 
+      `${service.name} - $${service.price} ${service.unit}`
+    ).join('\n');
+    
+    // estimated total of service
+    const estimatedTotal = selectedServices.reduce((sum, service) => 
+      sum + service.price, 0
+    ).toFixed(2);
+    
+    // email template parameters
+    const templateParams = {
+      customer_name: formData.name,
+      customer_phone: formData.phone,
+      customer_email: formData.email,
+      customer_address: formData.address,
+      selected_services: servicesText,
+      pickup_date: formData.pickupDate,
+      pickup_time: formData.pickupTime,
+      additional_notes: formData.notes || 'None',
+      estimated_total: estimatedTotal,
+      booking_date: new Date().toLocaleString()
     };
     
-    console.log('Booking data:', bookingData);
-    
-    setTimeout(() => {
-      alert('Booking submitted successfully! (This will connect to backend later)');
+    try {
+      // email using emailjs
+      if (window.emailjs) {
+        await window.emailjs.send(
+          'service_ejvyyd3',
+          'template_sz4yjc9',
+          templateParams
+        );
+        
+        alert('Booking submitted successfully! We will contact you soon.');
+        
+        // the form reset
+        setFormData({
+          name: '',
+          phone: '',
+          email: '',
+          address: '',
+          pickupDate: '',
+          pickupTime: '',
+          notes: ''
+        });
+        setSelectedServices([]);
+      } else {
+        throw new Error('EmailJS not loaded');
+      }
+      
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      alert('Failed to submit booking. Please try again or contact us directly.');
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   const serviceOptions = [
@@ -74,13 +203,18 @@ export default function BookingPage() {
       const exists = prev.find(s => s.id === service.id);
       
       if (exists) {
-        // Remove service
         return prev.filter(s => s.id !== service.id);
       } else {
-        // Add service
         return [...prev, service];
       }
     });
+    // Clear service error when user selects a service
+    if (errors.services) {
+      setErrors(prev => ({
+        ...prev,
+        services: ''
+      }));
+    }
   };
 
   return (
@@ -112,7 +246,7 @@ export default function BookingPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} style={{
+        <div style={{
           backgroundColor: 'white',
           padding: 'clamp(30px, 6vw, 50px)',
           borderRadius: '16px',
@@ -143,8 +277,10 @@ export default function BookingPage() {
                 Full Name <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <input
-                {...register('name', { required: 'Name is required' })}
+                name="name"
                 type="text"
+                value={formData.name}
+                onChange={handleInputChange}
                 placeholder="Kelvin Bruce"
                 style={{
                   width: '100%',
@@ -164,7 +300,7 @@ export default function BookingPage() {
                   fontSize: 'clamp(12px, 1.5vw, 14px)',
                   marginTop: '6px'
                 }}>
-                  {errors.name.message}
+                  {errors.name}
                 </p>
               )}
             </div>
@@ -181,14 +317,10 @@ export default function BookingPage() {
                 Phone Number <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <input
-                {...register('phone', { 
-                  required: 'Phone number is required',
-                  pattern: {
-                    value: /^[0-9+\s()-]+$/,
-                    message: 'Invalid phone number'
-                  }
-                })}
+                name="phone"
                 type="tel"
+                value={formData.phone}
+                onChange={handleInputChange}
                 placeholder="+1 (234) 567-8900"
                 style={{
                   width: '100%',
@@ -207,7 +339,46 @@ export default function BookingPage() {
                   fontSize: 'clamp(12px, 1.5vw, 14px)',
                   marginTop: '6px'
                 }}>
-                  {errors.phone.message}
+                  {errors.phone}
+                </p>
+              )}
+            </div>
+
+            {/* Email */}
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{
+                display: 'block',
+                fontSize: 'clamp(14px, 2vw, 16px)',
+                fontWeight: '500',
+                color: '#374151',
+                marginBottom: '8px'
+              }}>
+                Email Address <span style={{ color: '#ef4444' }}>*</span>
+              </label>
+              <input
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="brucekelvin742@gmail.com"
+                style={{
+                  width: '100%',
+                  padding: 'clamp(12px, 2vw, 14px)',
+                  border: errors.email ? '2px solid #ef4444' : '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  fontSize: 'clamp(14px, 2vw, 16px)',
+                  outline: 'none'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#6366f1'}
+                onBlur={(e) => e.target.style.borderColor = errors.email ? '#ef4444' : '#d1d5db'}
+              />
+              {errors.email && (
+                <p style={{
+                  color: '#ef4444',
+                  fontSize: 'clamp(12px, 1.5vw, 14px)',
+                  marginTop: '6px'
+                }}>
+                  {errors.email}
                 </p>
               )}
             </div>
@@ -224,7 +395,9 @@ export default function BookingPage() {
                 Pickup Address <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <textarea
-                {...register('address', { required: 'Address is required' })}
+                name="address"
+                value={formData.address}
+                onChange={handleInputChange}
                 rows="3"
                 placeholder="123 Main Street, Apt 4B, Toronto, ON"
                 style={{
@@ -246,7 +419,7 @@ export default function BookingPage() {
                   fontSize: 'clamp(12px, 1.5vw, 14px)',
                   marginTop: '6px'
                 }}>
-                  {errors.address.message}
+                  {errors.address}
                 </p>
               )}
             </div>
@@ -299,7 +472,6 @@ export default function BookingPage() {
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                        {/* Checkbox */}
                         <div style={{
                           width: '20px',
                           height: '20px',
@@ -317,7 +489,6 @@ export default function BookingPage() {
                           )}
                         </div>
                         
-                        {/* Service Info */}
                         <div style={{ flex: 1 }}>
                           <div style={{
                             display: 'flex',
@@ -356,18 +527,16 @@ export default function BookingPage() {
                 })}
               </div>
               
-              {selectedServices.length === 0 && (
+              {errors.services && (
                 <p style={{
-                  color: '#6b7280',
+                  color: '#ef4444',
                   fontSize: 'clamp(12px, 1.5vw, 14px)',
-                  marginTop: '8px',
-                  fontStyle: 'italic'
+                  marginTop: '8px'
                 }}>
-                  Please select at least one service
+                  {errors.services}
                 </p>
               )}
               
-              {/* Selected services summary */}
               {selectedServices.length > 0 && (
                 <div style={{
                   marginTop: '16px',
@@ -407,16 +576,10 @@ export default function BookingPage() {
                   Pickup Date <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
-                  {...register('pickupDate', { 
-                    required: 'Date is required',
-                    validate: (value) => {
-                      const today = new Date();
-                      today.setHours(0, 0, 0, 0);
-                      const selected = new Date(value);
-                      return selected >= today || 'Please select a future date';
-                    }
-                  })}
+                  name="pickupDate"
                   type="date"
+                  value={formData.pickupDate}
+                  onChange={handleInputChange}
                   min={new Date().toISOString().split('T')[0]}
                   style={{
                     width: '100%',
@@ -436,7 +599,7 @@ export default function BookingPage() {
                     fontSize: 'clamp(12px, 1.5vw, 14px)',
                     marginTop: '6px'
                   }}>
-                    {errors.pickupDate.message}
+                    {errors.pickupDate}
                   </p>
                 )}
               </div>
@@ -453,7 +616,9 @@ export default function BookingPage() {
                   Pickup Time <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <select
-                  {...register('pickupTime', { required: 'Please select a time' })}
+                  name="pickupTime"
+                  value={formData.pickupTime}
+                  onChange={handleInputChange}
                   style={{
                     width: '100%',
                     padding: 'clamp(12px, 2vw, 14px)',
@@ -480,7 +645,7 @@ export default function BookingPage() {
                     fontSize: 'clamp(12px, 1.5vw, 14px)',
                     marginTop: '6px'
                   }}>
-                    {errors.pickupTime.message}
+                    {errors.pickupTime}
                   </p>
                 )}
               </div>
@@ -499,7 +664,9 @@ export default function BookingPage() {
               Additional Notes (Optional)
             </label>
             <textarea
-              {...register('notes')}
+              name="notes"
+              value={formData.notes}
+              onChange={handleInputChange}
               rows="3"
               placeholder="Any special instructions or preferences..."
               style={{
@@ -519,7 +686,7 @@ export default function BookingPage() {
 
           {/* Submit Button */}
           <button
-            type="submit"
+            onClick={handleSubmit}
             disabled={isSubmitting}
             style={{
               width: '100%',
@@ -559,7 +726,7 @@ export default function BookingPage() {
           }}>
             By submitting, you agree to our Terms of Service and Privacy Policy
           </p>
-        </form>
+        </div>
       </div>
     </div>
   );
