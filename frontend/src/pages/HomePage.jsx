@@ -81,18 +81,18 @@ export default function HomePage({ initialHash }) {
               Schedule Pickup
             </NavLink>
 
-            <NavLink to="/#pricing" style={{
+            <NavLink to="/contact" state={{ background: location }} style={{
               backgroundColor: 'white',
               color: '#374151',
-              padding: 'clamp(12px, 2vw, 16px) clamp(24px, 4vw, 40px)',
-              fontSize: 'clamp(14px, 2vw, 18px)',
+              padding: '10px 24px',
+              fontSize: '16px',
               fontWeight: '600',
-              border: 'none',
-              borderRadius: '30px',
-              cursor: 'pointer',
+              borderRadius: '25px',
               textDecoration: 'none',
+              display: 'inline-block',
+              cursor: 'pointer'
             }}>
-              View Pricing
+              Contact Us
             </NavLink>
           </div>
         </div>
@@ -361,13 +361,13 @@ export default function HomePage({ initialHash }) {
             }}>
               Terms
             </a>
-            <a href="#" style={{
+            <NavLink to="/contact" state={{ background: location }} style={{
               color: '#94a3b8',
               textDecoration: 'none',
               fontSize: 'clamp(14px, 2vw, 16px)'
             }}>
               Contact
-            </a>
+            </NavLink>
           </div>
 
           <p style={{

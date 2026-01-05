@@ -1,14 +1,32 @@
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
-import { useState } from 'react';
+import { BrowserRouter, Routes, Route, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import HomePage from './pages/HomePage';
 import Services from './pages/services';
 import BookingPage from './pages/BookingPage';
+import ContactModal from './components/ContactModal';
 
-function App() {
+function AppContent() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const background = location.state && location.state.background;
+
+  useEffect(() => {
+    setContactOpen(location.pathname === '/contact');
+  }, [location.pathname]);
+
+  function closeModal() {
+    // If we have a background location, navigate back there; otherwise go to home
+    if (location.state && location.state.background) {
+      navigate(-1);
+      return;
+    }
+    navigate('/', { replace: true });
+  }
 
   return (
-    <BrowserRouter>
+    <>
       {/* Navigation Bar */}
       <nav style={{
         backgroundColor: 'white',
@@ -57,15 +75,15 @@ function App() {
               fontSize: '16px',
               fontWeight: '500'
             }}>
-              Services
+              Pricing/Services
             </NavLink>
-            <NavLink to="/pricing" style={{
+            <NavLink to="/contact" state={{ background: location }} style={{
               textDecoration: 'none',
               color: '#374151',
               fontSize: '16px',
               fontWeight: '500'
             }}>
-              Pricing
+              Contact
             </NavLink>
             <NavLink to="/booking" style={{
               backgroundColor: '#6366f1',
@@ -125,13 +143,8 @@ function App() {
             }}>
               Services
             </NavLink>
-            <NavLink to="/pricing" onClick={() => setMenuOpen(false)} style={{
-              textDecoration: 'none',
-              color: '#374151',
-              fontSize: '16px',
-              fontWeight: '500'
-            }}>
-              Pricing
+            <NavLink to="/contact" state={{ background: location }} onClick={() => setMenuOpen(false)} className="pill-btn full-width" style={{ textDecoration: 'none' }}>
+              Contact
             </NavLink>
             <NavLink to="/booking" onClick={() => setMenuOpen(false)} style={{
               backgroundColor: '#6366f1',
@@ -149,13 +162,27 @@ function App() {
         )}
       </nav>
 
-      {/* Routes */}
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-  <Route path="/pricing" element={<HomePage initialHash="pricing" />} />
-  <Route path="/services" element={<Services />} />
-  <Route path="/booking" element={<BookingPage />} />
+      {/* Routes (render background location when present so modal overlays on current page) */}
+      <Routes location={background || location}>
+        <Route path="/" element={<HomePage initialHash={undefined} />} />
+        <Route path="/pricing" element={<HomePage initialHash="pricing" />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/booking" element={<BookingPage />} />
+        {/* Direct access to /contact should show HomePage as the background for now */}
+        <Route path="/contact" element={<HomePage initialHash={undefined} />} />
       </Routes>
+      {/* Contact Modal */}
+      <ContactModal isOpen={contactOpen} onClose={closeModal} />
+
+     
+    </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   );
 }
