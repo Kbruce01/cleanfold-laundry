@@ -208,6 +208,7 @@ export default function BookingPage() {
         return [...prev, service];
       }
     });
+    
     // Clear service error when user selects a service
     if (errors.services) {
       setErrors(prev => ({
