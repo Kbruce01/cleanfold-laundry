@@ -1,32 +1,15 @@
-import { BrowserRouter, Routes, Route, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 import HomePage from './pages/HomePage';
-import Services from './pages/services';
 import BookingPage from './pages/BookingPage';
-import ContactModal from './components/ContactModal';
+import Services from './pages/Services';
 
-function AppContent() {
+function App() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [contactOpen, setContactOpen] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const background = location.state && location.state.background;
-
-  useEffect(() => {
-    setContactOpen(location.pathname === '/contact');
-  }, [location.pathname]);
-
-  function closeModal() {
-    // If we have a background location, navigate back there; otherwise go to home
-    if (location.state && location.state.background) {
-      navigate(-1);
-      return;
-    }
-    navigate('/', { replace: true });
-  }
 
   return (
-    <>
+    <BrowserRouter>
       {/* Navigation Bar */}
       <nav style={{
         backgroundColor: 'white',
@@ -34,7 +17,8 @@ function AppContent() {
         borderBottom: '1px solid #e5e7eb',
         position: 'sticky',
         top: 0,
-        zIndex: 1000
+        zIndex: 1000,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
       }}>
         <div style={{
           maxWidth: '1400px',
@@ -44,14 +28,20 @@ function AppContent() {
           alignItems: 'center'
         }}>
           {/* Logo */}
-          <NavLink to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={{
+          <Link to="/" style={{
             fontSize: 'clamp(20px, 4vw, 28px)',
             fontWeight: 'bold',
             color: '#6366f1',
             textDecoration: 'none'
           }}>
-            CleanFold
-          </NavLink>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            >
+              CleanFold
+            </motion.div>
+          </Link>
 
           {/* Desktop Nav Links */}
           <div style={{
@@ -61,46 +51,53 @@ function AppContent() {
           }}
           className="desktop-nav"
           >
-            <NavLink to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={{
-              textDecoration: 'none',
-              color: '#374151',
-              fontSize: '16px',
-              fontWeight: '500'
-            }}>
-              Home
-            </NavLink>
-            <NavLink to="/services" style={{
-              textDecoration: 'none',
-              color: '#374151',
-              fontSize: '16px',
-              fontWeight: '500'
-            }}>
-              Pricing/Services
-            </NavLink>
-            <NavLink to="/contact" state={{ background: location }} style={{
-              textDecoration: 'none',
-              color: '#374151',
-              fontSize: '16px',
-              fontWeight: '500'
-            }}>
-              Contact
-            </NavLink>
-            <NavLink to="/booking" style={{
-              backgroundColor: '#6366f1',
-              color: 'white',
-              padding: '10px 24px',
-              borderRadius: '25px',
-              textDecoration: 'none',
-              fontSize: '16px',
-              fontWeight: '600'
-            }}>
-              Schedule Pickup
-            </NavLink>
+            <NavLink to="/">Home</NavLink>
+            <NavLink to="/services">Services</NavLink>
+            {/*<NavLink to="/pricing">Pricing</NavLink>*/}
+            
+            <Link to="/booking" style={{ textDecoration: 'none' }}>
+              <motion.div
+                whileHover={{
+                  scale: 1.05,
+                  boxShadow: "0 8px 20px rgba(99, 102, 241, 0.3)",
+                }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                style={{
+                  backgroundColor: '#6366f1',
+                  color: 'white',
+                  padding: '10px 24px',
+                  borderRadius: '25px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+              >
+                <motion.div
+                  initial={{ x: '-100%' }}
+                  whileHover={{ x: '100%' }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
+                    pointerEvents: 'none',
+                  }}
+                />
+                <span style={{ position: 'relative', zIndex: 1 }}>Schedule Pickup</span>
+              </motion.div>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
-          <button
+          <motion.button
             onClick={() => setMenuOpen(!menuOpen)}
+            whileTap={{ scale: 0.9 }}
             style={{
               display: 'none',
               background: 'none',
@@ -112,78 +109,152 @@ function AppContent() {
             className="mobile-menu-btn"
           >
             {menuOpen ? '✕' : '☰'}
-          </button>
+          </motion.button>
         </div>
 
         {/* Mobile Menu */}
         {menuOpen && (
-          <div style={{
-            display: 'none',
-            flexDirection: 'column',
-            gap: '20px',
-            marginTop: '20px',
-            paddingTop: '20px',
-            borderTop: '1px solid #e5e7eb'
-          }}
-          className="mobile-menu"
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              display: 'none',
+              flexDirection: 'column',
+              gap: '20px',
+              marginTop: '20px',
+              paddingTop: '20px',
+              borderTop: '1px solid #e5e7eb'
+            }}
+            className="mobile-menu"
           >
-            <NavLink to="/" onClick={() => { setMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }} style={{
-              textDecoration: 'none',
-              color: '#374151',
-              fontSize: '16px',
-              fontWeight: '500'
-            }}>
+            <MobileNavLink to="/" onClick={() => setMenuOpen(false)}>
               Home
-            </NavLink>
-            <NavLink to="/services" onClick={() => setMenuOpen(false)} style={{
-              textDecoration: 'none',
-              color: '#374151',
-              fontSize: '16px',
-              fontWeight: '500'
-            }}>
+            </MobileNavLink>
+            <MobileNavLink to="/services" onClick={() => setMenuOpen(false)}>
               Services
-            </NavLink>
-            <NavLink to="/contact" state={{ background: location }} onClick={() => setMenuOpen(false)} className="pill-btn full-width" style={{ textDecoration: 'none' }}>
-              Contact
-            </NavLink>
-            <NavLink to="/booking" onClick={() => setMenuOpen(false)} style={{
-              backgroundColor: '#6366f1',
-              color: 'white',
-              padding: '12px 24px',
-              borderRadius: '25px',
-              textDecoration: 'none',
-              fontSize: '16px',
-              fontWeight: '600',
-              textAlign: 'center'
-            }}>
-              Schedule Pickup
-            </NavLink>
-          </div>
+            </MobileNavLink>
+            <MobileNavLink to="/pricing" onClick={() => setMenuOpen(false)}>
+              Pricing
+            </MobileNavLink>
+            <Link to="/booking" onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none' }}>
+              <motion.div
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  backgroundColor: '#6366f1',
+                  color: 'white',
+                  padding: '12px 24px',
+                  borderRadius: '25px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                }}
+              >
+                Schedule Pickup
+              </motion.div>
+            </Link>
+          </motion.div>
         )}
       </nav>
 
-      {/* Routes (render background location when present so modal overlays on current page) */}
-      <Routes location={background || location}>
-        <Route path="/" element={<HomePage initialHash={undefined} />} />
-        <Route path="/pricing" element={<HomePage initialHash="pricing" />} />
-        <Route path="/services" element={<Services />} />
+      {/* Routes */}
+      <Routes>
+        <Route path="/" element={<HomePage />} />
         <Route path="/booking" element={<BookingPage />} />
-        {/* Direct access to /contact should show HomePage as the background for now */}
-        <Route path="/contact" element={<HomePage initialHash={undefined} />} />
+        <Route path="/services" element={<Services />} />
       </Routes>
-      {/* Contact Modal */}
-      <ContactModal isOpen={contactOpen} onClose={closeModal} />
-
-     
-    </>
+    </BrowserRouter>
   );
 }
 
-function App() {
+// Animated Nav Link Component for Desktop
+function NavLink({ to, children }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const location = useLocation();
+  const isActive = location.pathname === to;
+
   return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
+    <Link
+      to={to}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{
+        textDecoration: 'none',
+        color: '#374151',
+        fontSize: '16px',
+        fontWeight: '500',
+        position: 'relative',
+        padding: '8px 16px',
+        display: 'inline-block',
+      }}
+    >
+      <motion.div
+        animate={{
+          backgroundColor: isHovered || isActive ? '#f3f4f6' : 'transparent',
+          borderRadius: isHovered || isActive ? '12px' : '0px',
+        }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: -1,
+        }}
+      />
+      <motion.span
+        animate={{
+          color: isHovered || isActive ? '#6366f1' : '#374151',
+        }}
+        transition={{ duration: 0.2 }}
+      >
+        {children}
+      </motion.span>
+      
+      {/* Animated underline */}
+      <motion.div
+        initial={{ scaleX: isActive ? 1 : 0 }}
+        animate={{ scaleX: isHovered || isActive ? 1 : 0 }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          position: 'absolute',
+          bottom: '4px',
+          left: '16px',
+          right: '16px',
+          height: '2px',
+          backgroundColor: '#6366f1',
+          transformOrigin: 'left',
+        }}
+      />
+    </Link>
+  );
+}
+
+// Animated Nav Link Component for Mobile
+function MobileNavLink({ to, onClick, children }) {
+  const location = useLocation();
+  const isActive = location.pathname === to;
+
+  return (
+    <Link to={to} onClick={onClick} style={{ textDecoration: 'none' }}>
+      <motion.div
+        whileTap={{ scale: 0.95 }}
+        transition={{ duration: 0.2 }}
+        style={{
+          color: isActive ? '#6366f1' : '#374151',
+          fontSize: '16px',
+          fontWeight: isActive ? '600' : '500',
+          padding: '8px 16px',
+          borderRadius: '8px',
+          backgroundColor: isActive ? '#f3f4f6' : 'transparent',
+        }}
+      >
+        {children}
+      </motion.div>
+    </Link>
   );
 }
 
