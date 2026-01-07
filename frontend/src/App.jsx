@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import HomePage from './pages/HomePage';
 import BookingPage from './pages/BookingPage';
+import Services from './pages/Services';
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -52,7 +53,7 @@ function App() {
           >
             <NavLink to="/">Home</NavLink>
             <NavLink to="/services">Services</NavLink>
-            <NavLink to="/pricing">Pricing</NavLink>
+            {/*<NavLink to="/pricing">Pricing</NavLink>*/}
             
             <Link to="/booking" style={{ textDecoration: 'none' }}>
               <motion.div
@@ -162,6 +163,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/booking" element={<BookingPage />} />
+        <Route path="/services" element={<Services />} />
       </Routes>
     </BrowserRouter>
   );
