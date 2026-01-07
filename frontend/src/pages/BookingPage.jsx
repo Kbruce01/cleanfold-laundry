@@ -163,28 +163,28 @@ export default function BookingPage() {
     { 
       id: 'wash-fold', 
       name: 'Wash & Fold', 
-      price: 1.50, 
+      price: 1.29, 
       unit: 'per lb',
       description: 'Your clothes washed, dried, and neatly folded'
     },
     { 
       id: 'dry-clean', 
       name: 'Dry Cleaning', 
-      price: 8.99, 
+      price: 4.99, 
       unit: 'per item',
       description: 'Professional dry cleaning for delicate items'
     },
     { 
       id: 'premium-care', 
       name: 'Premium Care', 
-      price: 15.99, 
+      price: 11.99, 
       unit: 'per item',
       description: 'Delicate handling with hand finishing'
     },
     { 
       id: 'ironing', 
       name: 'Ironing', 
-      price: 1.50, 
+      price: 1.99, 
       unit: 'per item',
       description: 'Crisp and wrinkle-free clothes'
     },
@@ -282,7 +282,7 @@ export default function BookingPage() {
                 type="text"
                 value={formData.name}
                 onChange={handleInputChange}
-                placeholder="Kelvin Bruce"
+                placeholder="Richard Bruce"
                 style={{
                   width: '100%',
                   padding: 'clamp(12px, 2vw, 14px)',
@@ -322,7 +322,7 @@ export default function BookingPage() {
                 type="tel"
                 value={formData.phone}
                 onChange={handleInputChange}
-                placeholder="+1 (234) 567-8900"
+                placeholder="+1 (647) 123-4567"
                 style={{
                   width: '100%',
                   padding: 'clamp(12px, 2vw, 14px)',
@@ -361,7 +361,7 @@ export default function BookingPage() {
                 type="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                placeholder="brucekelvin742@gmail.com"
+                placeholder="cleanfoldlaundry@gmail.com"
                 style={{
                   width: '100%',
                   padding: 'clamp(12px, 2vw, 14px)',

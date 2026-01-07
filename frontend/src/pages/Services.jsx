@@ -12,28 +12,28 @@ export default function Services() {
     {
       id: 'wash-fold',
       name: 'Wash & Fold',
-      price: '$1.50 / lb',
+      price: '$1.29 / lb',
       description: 'Quick, affordable wash and fold service — washed, dried and neatly folded.',
       icon: '🧺'
     },
     {
       id: 'dry-clean',
       name: 'Dry Cleaning',
-      price: '$8.99 / item',
+      price: '$4.99 / item',
       description: 'Professional dry cleaning for suits, dresses and delicate garments.',
       icon: '👔'
     },
     {
       id: 'premium-care',
       name: 'Premium Care',
-      price: '$15.99 / item',
+      price: '$11.99 / item',
       description: 'Hand-finished, delicate handling and premium packaging.',
       icon: '✨'
     },
     {
       id: 'ironing',
       name: 'Ironing & Pressing',
-      price: '$1.50 / item',
+      price: '$1.99 / item',
       description: 'Crisp, wrinkle-free results for shirts, trousers and linens.',
       icon: '👕'
     }

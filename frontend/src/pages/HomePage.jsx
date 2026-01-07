@@ -32,19 +32,19 @@ export default function HomePage() {
   const pricingCardsData = [
     {
       title: "Wash & Fold",
-      price: "$ 1.50",
+      price: "$ 1.29",
       unit: "/per lb",
       features: ["Same-day available", "Eco-friendly detergent", "Folded & packaged"],
     },
     {
       title: "Dry Cleaning",
-      price: "$ 8.99",
+      price: "$ 4.99",
       unit: "/per item",
       features: ["Expert pressing", "Stain removal", "Protective bags"],
     },
     {
       title: "Premium Care",
-      price: "$ 15.99",
+      price: "$ 11.99",
       unit: "/per item",
       features: ["Delicate handling", "Hand finishing", "Premium packaging"],
     },
@@ -145,6 +145,7 @@ export default function HomePage() {
               Schedule Pickup →
             </motion.button>
             <motion.button
+              onClick={() => navigate('/services')}
               whileHover={{
                 scale: 1.05,
                 backgroundColor: "#f9fafb",

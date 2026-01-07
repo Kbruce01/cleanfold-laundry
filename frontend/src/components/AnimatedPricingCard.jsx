@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
+import { useNavigate } from 'react-router-dom';
 
 export default function AnimatedPricingCard({ title, price, unit, features, isActive, onActivate }) {
+  const navigate = useNavigate();
   const activeBackground = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
 
   return (
@@ -210,6 +212,7 @@ export default function AnimatedPricingCard({ title, price, unit, features, isAc
       </ul>
 
       <motion.button
+        onClick={() => navigate('/booking')}
         whileHover={{
           scale: 1.05,
           boxShadow: isActive
