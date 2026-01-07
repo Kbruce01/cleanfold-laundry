@@ -135,8 +135,8 @@ function App() {
             <MobileNavLink to="/services" onClick={() => setMenuOpen(false)}>
               Services
             </MobileNavLink>
-            <MobileNavLink to="/pricing" onClick={() => setMenuOpen(false)}>
-              Pricing
+            <MobileNavLink to="/services" onClick={() => setMenuOpen(false)}>
+              Services
             </MobileNavLink>
             <Link to="/booking" onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none' }}>
               <motion.div
