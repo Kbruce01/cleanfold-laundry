@@ -1,6 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import adminRoutes from './routes/admin.js'
+import authRoutes from './routes/auth.js'
+import bookingRoutes from './routes/booking.js'
 
 dotenv.config();
 
@@ -16,7 +19,11 @@ app.get('/', (req, res) => {
   res.json({ message: 'CleanFold API is running!' });
 });
 
-// API Routes will go here
+// API Routes 
+app.use('/api/auth', authRoutes)
+app.use('/api/admin', adminRoutes)
+app.use('/api/bookings', bookingRoutes)
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'healthy', timestamp: new Date() });
 });
@@ -24,6 +31,8 @@ app.get('/api/health', (req, res) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`Test it: http://localhost:${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/api/health`);
 });
+
+console.log(process.env.SUPABASE_URL)
+console.log(process.env.SUPABASE_KEY)
